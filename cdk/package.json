@@ -1,0 +1,23 @@
+{
+  "name": "sector-map-cdk",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "synth": "npx cdk synth",
+    "bootstrap": "npx cdk bootstrap",
+    "deploy": "npx cdk deploy",
+    "diff": "npx cdk diff"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.190.0",
+    "constructs": "^10.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "aws-cdk": "^2.1015.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
