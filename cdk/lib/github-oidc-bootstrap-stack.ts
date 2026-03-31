@@ -15,7 +15,10 @@ export class GitHubOidcBootstrapStack extends Stack {
 
     const providerUrl = "https://token.actions.githubusercontent.com";
     const providerHost = "token.actions.githubusercontent.com";
-    const subPattern = `repo:${props.repoOwner}/${props.repoName}:ref:refs/heads/main`;
+    const subPatterns = [
+      `repo:${props.repoOwner}/${props.repoName}:ref:refs/heads/main`,
+      `repo:${props.repoOwner}/${props.repoName}:environment:production`,
+    ];
 
     const provider = props.createOidcProvider
       ? new OpenIdConnectProvider(this, "GitHubOidcProvider", {
@@ -35,7 +38,7 @@ export class GitHubOidcBootstrapStack extends Stack {
           [`${providerHost}:aud`]: "sts.amazonaws.com",
         },
         StringLike: {
-          [`${providerHost}:sub`]: subPattern,
+          [`${providerHost}:sub`]: subPatterns,
         },
       }),
       inlinePolicies: {
@@ -106,7 +109,7 @@ export class GitHubOidcBootstrapStack extends Stack {
     });
 
     new CfnOutput(this, "GitHubOidcSubPattern", {
-      value: subPattern,
+      value: subPatterns.join(","),
       description: "OIDC sub claim pattern trusted by this role.",
     });
 
