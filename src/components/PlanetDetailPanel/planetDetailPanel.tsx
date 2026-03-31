@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { buildPlanetDetailProfile } from "../../common/lore/planetProfile";
+import { useI18n } from "../../i18n";
 import {
-  worldClassifications,
   type PlanetOwnerFaction,
   type SpaceFaction,
   type StarSystem,
@@ -153,29 +153,31 @@ const resolvePlanetOwner = (systemFaction: SpaceFaction, world: World): PlanetOw
 
 export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps) {
   const { system, world } = selection;
-  const classInfo = worldClassifications[world.classification];
+  const { catalog } = useI18n();
+  const classInfo = catalog.data.worldClassifications[world.classification];
   const profile = buildPlanetDetailProfile(system, world);
   const moonSpecs = useMemo(() => makeMoonSpecs(system, world), [system, world]);
   const planetPalette = planetPaletteByClass[world.classification];
   const owner = resolvePlanetOwner(system.faction, world);
   const [hoverBody, setHoverBody] = useState<string>(world.knownName);
+  const panelCopy = catalog.ui.planetPanel;
 
   return (
     <>
-      <Backdrop aria-label="Close planet detail panel" onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+      <Backdrop aria-label={panelCopy.closeOverlayAria} onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
       <Panel
         initial={{ x: 54, opacity: 0, filter: "blur(10px)" }}
         animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
         exit={{ x: 42, opacity: 0, filter: "blur(8px)" }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         role="dialog"
-        aria-label={`Planet dossier for ${world.knownName}`}
+        aria-label={panelCopy.dialogAria(world.knownName)}
       >
         <Header>
           <HeaderTopline>
-            <Kicker>Planetary Dossier</Kicker>
+            <Kicker>{panelCopy.kicker}</Kicker>
             <CloseButton type="button" onClick={onClose}>
-              Close
+              {panelCopy.close}
             </CloseButton>
           </HeaderTopline>
           <PlanetTitle>{world.knownName}</PlanetTitle>
@@ -185,17 +187,17 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
             <Chip>{classInfo.title}</Chip>
             <Chip>{owner}</Chip>
             <Chip tone={system.threat === "critical" ? "danger" : system.threat === "high" ? "warn" : "neutral"}>
-              System Threat: {system.threat}
+              {panelCopy.systemThreat}: {system.threat}
             </Chip>
-            {world.underSiege ? <Chip tone="danger">Under Siege</Chip> : null}
-            {world.underSedition ? <Chip tone="danger">Sedition</Chip> : null}
+            {world.underSiege ? <Chip tone="danger">{panelCopy.underSiege}</Chip> : null}
+            {world.underSedition ? <Chip tone="danger">{panelCopy.sedition}</Chip> : null}
           </ChipRow>
         </Header>
 
         <Content>
           <ColumnStack sticky>
             <ChartCard>
-              <h3>Orbital Chart</h3>
+              <h3>{panelCopy.orbitalChart}</h3>
               <ChartViewport onMouseEnter={() => setHoverBody(world.knownName)} onMouseLeave={() => setHoverBody(world.knownName)}>
                 <ChartLabel>{hoverBody}</ChartLabel>
                 {moonSpecs.map((moon) => (
@@ -203,10 +205,10 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
                     <MoonBody
                       size={moon.size}
                       tint={moon.tint}
-                      onMouseEnter={() => setHoverBody(`${moon.designation} "${moon.knownName}"`)}
-                      onFocus={() => setHoverBody(`${moon.designation} "${moon.knownName}"`)}
+                      onMouseEnter={() => setHoverBody(panelCopy.moonHoverLabel(moon.designation, moon.knownName))}
+                      onFocus={() => setHoverBody(panelCopy.moonHoverLabel(moon.designation, moon.knownName))}
                       onBlur={() => setHoverBody(world.knownName)}
-                      aria-label={`${moon.designation} ${moon.knownName}`}
+                      aria-label={panelCopy.moonAriaLabel(moon.designation, moon.knownName)}
                     />
                   </OrbitRing>
                 ))}
@@ -216,18 +218,14 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
                   accent={planetPalette.accent}
                   onMouseEnter={() => setHoverBody(world.knownName)}
                   onFocus={() => setHoverBody(world.knownName)}
-                  aria-label={`Planet ${world.knownName}`}
+                  aria-label={panelCopy.planetAriaLabel(world.knownName)}
                 />
               </ChartViewport>
-              <ChartFootnote>
-                {moonSpecs.length === 0
-                  ? "No major natural satellites are currently charted for this world."
-                  : `${moonSpecs.length} major moon${moonSpecs.length > 1 ? "s" : ""} charted for this world.`}
-              </ChartFootnote>
+              <ChartFootnote>{moonSpecs.length === 0 ? panelCopy.noMoons : panelCopy.moonCount(moonSpecs.length)}</ChartFootnote>
             </ChartCard>
 
             <InfoCard>
-              <h3>Infobox</h3>
+              <h3>{panelCopy.infobox}</h3>
               <InfoList>
                 {profile.infobox.map((entry) => (
                   <div key={entry.label}>
@@ -238,7 +236,7 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
               </InfoList>
             </InfoCard>
             <InfoCard>
-              <h3>Operational Metrics</h3>
+              <h3>{panelCopy.operationalMetrics}</h3>
               <MetricsGrid>
                 {profile.metrics.map((metric) => (
                   <MetricCard key={metric.label} tone={metric.tone}>
@@ -258,7 +256,7 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
               </LoreSection>
             ))}
             <LoreSection>
-              <h3>Current Campaign Notes</h3>
+              <h3>{panelCopy.campaignNotes}</h3>
               <NotesList>
                 {profile.campaignNotes.map((note) => (
                   <li key={note}>{note}</li>

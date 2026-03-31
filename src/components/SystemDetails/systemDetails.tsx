@@ -1,11 +1,10 @@
 import { AnimatePresence } from "framer-motion";
+import { useI18n } from "../../i18n";
 import {
-  worldClassifications,
   type Climate,
   type PlanetOwnerFaction,
   type SpaceFaction,
   type StarSystem,
-  type ThreatLevel,
   type World,
 } from "../../data/systems";
 import { InteractionCard } from "../InteractionCard";
@@ -35,13 +34,6 @@ import {
   WorldTopline,
 } from "./systemDetails.styles";
 
-const threatCopy: Record<ThreatLevel, string> = {
-  low: "Tithe lanes secure",
-  medium: "Xenos raids rising",
-  high: "Warp breach threat",
-  critical: "Exterminatus watch",
-};
-
 const climateDisplay: Record<Climate, string> = {
   Temperate: "Temperate",
   Arcapelago: "Archipelago",
@@ -55,23 +47,51 @@ const climateDisplay: Record<Climate, string> = {
   "No Atmosphere": "No Atmosphere",
 };
 
-const factionIntelLabel: Record<SpaceFaction, string> = {
-  Imperium: "Imperial Guard Regiment",
-  Chaos: "Ruling Warband",
-  Contested: "Primary Belligerents",
-  Greenskin: "Known Warboss",
-  Renegade: "Renegade Commander",
+type IntelCopy = {
+  factionIntelLabels: {
+    imperialGuardRegiment: string;
+    rulingWarband: string;
+    primaryBelligerents: string;
+    knownWarboss: string;
+    renegadeCommander: string;
+    xenosAuthority: string;
+    planetaryGovernor: string;
+    patronWorship: string;
+  };
+  intelFallbacks: {
+    noStandingRegiment: string;
+    regimentRedacted: string;
+    traitorUnconfirmed: string;
+    noDominantWarboss: string;
+    renegadeFragmented: string;
+    imperialHostileContest: string;
+    imperialGarrisonUnknown: string;
+    traitorActivityConfirmed: string;
+    renegadeCellsContest: string;
+    greenskinRaidersHold: string;
+    xenosCommandUnknown: string;
+    governorUnknown: string;
+    chaosUndivided: string;
+  };
 };
 
-const ownerIntelLabel: Record<PlanetOwnerFaction, string> = {
-  Imperium: "Imperial Guard Regiment",
-  Chaos: "Ruling Warband",
-  Renegade: "Renegade Commander",
-  Greenskin: "Known Warboss",
-  Xenos: "Xenos Authority",
-};
+const getIntelLabel = (faction: SpaceFaction, world: World, copy: IntelCopy) => {
+  const factionIntelLabel: Record<SpaceFaction, string> = {
+    Imperium: copy.factionIntelLabels.imperialGuardRegiment,
+    Chaos: copy.factionIntelLabels.rulingWarband,
+    Contested: copy.factionIntelLabels.primaryBelligerents,
+    Greenskin: copy.factionIntelLabels.knownWarboss,
+    Renegade: copy.factionIntelLabels.renegadeCommander,
+  };
 
-const getIntelLabel = (faction: SpaceFaction, world: World) => {
+  const ownerIntelLabel: Record<PlanetOwnerFaction, string> = {
+    Imperium: copy.factionIntelLabels.imperialGuardRegiment,
+    Chaos: copy.factionIntelLabels.rulingWarband,
+    Renegade: copy.factionIntelLabels.renegadeCommander,
+    Greenskin: copy.factionIntelLabels.knownWarboss,
+    Xenos: copy.factionIntelLabels.xenosAuthority,
+  };
+
   if (faction === "Contested" && world.ownerFaction) {
     return ownerIntelLabel[world.ownerFaction];
   }
@@ -79,63 +99,63 @@ const getIntelLabel = (faction: SpaceFaction, world: World) => {
   return factionIntelLabel[faction];
 };
 
-const getFactionIntel = (faction: SpaceFaction, world: World) => {
+const getFactionIntel = (faction: SpaceFaction, world: World, copy: IntelCopy) => {
   if (faction === "Imperium") {
     if (world.classification === "rho" || world.classification === "delta") {
-      return "No standing planetary regiment. Security is maintained by rotating off-world detachments.";
+      return copy.intelFallbacks.noStandingRegiment;
     }
-    return world.imperialRegiment ?? "Regiment data redacted";
+    return world.imperialRegiment ?? copy.intelFallbacks.regimentRedacted;
   }
 
   if (faction === "Chaos") {
-    return world.rulingWarband ?? "Traitor warband unconfirmed";
+    return world.rulingWarband ?? copy.intelFallbacks.traitorUnconfirmed;
   }
 
   if (faction === "Greenskin") {
-    return world.warboss ?? "No dominant warboss identified";
+    return world.warboss ?? copy.intelFallbacks.noDominantWarboss;
   }
 
   if (faction === "Renegade") {
-    return world.renegadeCommander ?? "Renegade command hierarchy fragmented";
+    return world.renegadeCommander ?? copy.intelFallbacks.renegadeFragmented;
   }
 
   if (faction === "Contested") {
     if (world.ownerFaction === "Imperium") {
-      return world.imperialRegiment ?? "Imperial garrison strength unknown";
+      return world.imperialRegiment ?? copy.intelFallbacks.imperialGarrisonUnknown;
     }
 
     if (world.ownerFaction === "Chaos") {
-      return world.rulingWarband ?? "Traitor warband activity confirmed";
+      return world.rulingWarband ?? copy.intelFallbacks.traitorActivityConfirmed;
     }
 
     if (world.ownerFaction === "Renegade") {
-      return world.renegadeCommander ?? "Renegade cells contest orbital command";
+      return world.renegadeCommander ?? copy.intelFallbacks.renegadeCellsContest;
     }
 
     if (world.ownerFaction === "Greenskin") {
-      return world.warboss ?? "Greenskin raiding mobs hold the lower zones";
+      return world.warboss ?? copy.intelFallbacks.greenskinRaidersHold;
     }
 
     if (world.ownerFaction === "Xenos") {
-      return world.xenosAuthority ?? "Xenos command body not fully identified";
+      return world.xenosAuthority ?? copy.intelFallbacks.xenosCommandUnknown;
     }
   }
 
-  return "Imperial and hostile fleets contest orbital control";
+  return copy.intelFallbacks.imperialHostileContest;
 };
 
-const getSecondaryIntel = (faction: SpaceFaction, world: World) => {
+const getSecondaryIntel = (faction: SpaceFaction, world: World, copy: IntelCopy) => {
   if (faction === "Imperium") {
     return {
-      label: "Planetary Governor",
-      value: world.governor ?? "Governor not confirmed",
+      label: copy.factionIntelLabels.planetaryGovernor,
+      value: world.governor ?? copy.intelFallbacks.governorUnknown,
     };
   }
 
   if (faction === "Chaos") {
     return {
-      label: "Patron Worship",
-      value: world.patronWorship ?? "Chaos Undivided",
+      label: copy.factionIntelLabels.patronWorship,
+      value: world.patronWorship ?? copy.intelFallbacks.chaosUndivided,
     };
   }
 
@@ -176,6 +196,10 @@ export function SystemDetails({
   onPlanetHover,
   getWorldKey,
 }: SystemDetailsProps) {
+  const { catalog } = useI18n();
+  const { systemDetails } = catalog.ui;
+  const { worldClassifications } = catalog.data;
+
   return (
     <DetailColumn>
       <AnimatePresence mode="wait">
@@ -189,7 +213,7 @@ export function SystemDetails({
           >
             <DetailHeader>
               <div>
-                <Threat level={activeSystem.threat}>{threatCopy[activeSystem.threat]}</Threat>
+                <Threat level={activeSystem.threat}>{systemDetails.threatCopy[activeSystem.threat]}</Threat>
                 <h2>{activeSystem.name}</h2>
               </div>
               <FactionChip>{activeSystem.faction}</FactionChip>
@@ -199,19 +223,19 @@ export function SystemDetails({
 
             <StarMetaGrid>
               <StarMetaCard>
-                <strong>Star Class</strong>
+                <strong>{systemDetails.starClass}</strong>
                 <span>{activeSystem.starClass}</span>
               </StarMetaCard>
               <StarMetaCard>
-                <strong>Estimated Age</strong>
+                <strong>{systemDetails.estimatedAge}</strong>
                 <span>{activeSystem.starAge}</span>
               </StarMetaCard>
               <StarMetaCard>
-                <strong>Stability</strong>
+                <strong>{systemDetails.stability}</strong>
                 <span>{activeSystem.stability}</span>
               </StarMetaCard>
               <StarMetaCard>
-                <strong>Astral Note</strong>
+                <strong>{systemDetails.astralNote}</strong>
                 <span>{activeSystem.astralNote}</span>
               </StarMetaCard>
             </StarMetaGrid>
@@ -220,7 +244,7 @@ export function SystemDetails({
               {activeSystem.worlds.map((world, index) => {
                 const worldKey = getWorldKey(activeSystem.id, world);
                 const owner = resolvePlanetOwner(activeSystem.faction, world);
-                const secondaryIntel = getSecondaryIntel(activeSystem.faction, world);
+                const secondaryIntel = getSecondaryIntel(activeSystem.faction, world, systemDetails);
                 return (
                   <WorldCard
                     key={worldKey}
@@ -243,7 +267,7 @@ export function SystemDetails({
                     }}
                     role="button"
                     tabIndex={0}
-                    aria-label={`Open planet dossier for ${activeSystem.name} ${world.orbitalDesignation} ${world.knownName}`}
+                    aria-label={systemDetails.openPlanetDossier(activeSystem.name, world.orbitalDesignation, world.knownName)}
                   >
                     <WorldTopline>
                       <WorldDesignation>
@@ -258,7 +282,10 @@ export function SystemDetails({
                             onPlanetSelect(worldKey);
                           }}
                           type="button"
-                          title={`${worldClassifications[world.classification].code} ${worldClassifications[world.classification].title}`}
+                          title={systemDetails.worldClassTooltip(
+                            worldClassifications[world.classification].code,
+                            worldClassifications[world.classification].title,
+                          )}
                         >
                           {worldClassifications[world.classification].code.split("-")[0]}
                         </ClassBubble>
@@ -266,15 +293,19 @@ export function SystemDetails({
                       </WorldClassBlock>
                     </WorldTopline>
                     <WorldBadges>
-                      <ClimateBadge climate={world.climate}>Climate: {climateDisplay[world.climate]}</ClimateBadge>
-                      {world.underSiege ? <SiegeBadge>Under Siege</SiegeBadge> : null}
-                      {world.underSedition ? <SeditionBadge>Sedition</SeditionBadge> : null}
+                      <ClimateBadge climate={world.climate}>
+                        {systemDetails.climateLabel}: {climateDisplay[world.climate]}
+                      </ClimateBadge>
+                      {world.underSiege ? <SiegeBadge>{systemDetails.underSiege}</SiegeBadge> : null}
+                      {world.underSedition ? <SeditionBadge>{systemDetails.sedition}</SeditionBadge> : null}
                     </WorldBadges>
-                    <p>Population: {world.population}</p>
+                    <p>
+                      {systemDetails.populationLabel}: {world.population}
+                    </p>
                     <p>{world.status}</p>
                     <IntelLine>
-                      <strong>{getIntelLabel(activeSystem.faction, world)}:</strong>
-                      {getFactionIntel(activeSystem.faction, world)}
+                      <strong>{getIntelLabel(activeSystem.faction, world, systemDetails)}:</strong>
+                      {getFactionIntel(activeSystem.faction, world, systemDetails)}
                       {!secondaryIntel ? (
                         <OwnerPill owner={owner} className="intel-owner">
                           {owner}
@@ -303,8 +334,8 @@ export function SystemDetails({
             exit={{ opacity: 0, x: -14 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
           >
-            <h2>No System Selected</h2>
-            <p>Click a system to lock it in the dossier. Click empty space on the map to clear.</p>
+            <h2>{systemDetails.emptyTitle}</h2>
+            <p>{systemDetails.emptyBody}</p>
           </EmptyDetailPanel>
         )}
       </AnimatePresence>

@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { HeroSection } from "./components/HeroSection";
 import { PlanetDetailPanel } from "./components/PlanetDetailPanel";
 import { SystemDetails } from "./components/SystemDetails";
+import { useI18n } from "./i18n";
 import {
   AppShell,
   BlackHole,
@@ -16,12 +17,7 @@ import {
   WarpRouteLayer,
   WarpRouteLine,
 } from "./app.styles";
-import {
-  systems,
-  worldClassifications,
-  type StarSystem,
-  type World,
-} from "./data/systems";
+import { type StarSystem, type World } from "./data/systems";
 
 const MAP_SIZE = { width: 1750, height: 1100 };
 const GRID_SIZE = 190;
@@ -124,6 +120,8 @@ const buildTravelRoutes = (allSystems: StarSystem[]): WarpRoute[] => {
 
 
 function App() {
+  const { catalog } = useI18n();
+  const { systems, worldClassifications } = catalog.data;
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const dragMovedRef = useRef(false);
   const dragState = useRef<{
@@ -139,7 +137,7 @@ function App() {
   const [selectedPlanetKey, setSelectedPlanetKey] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const systemById = new Map(systems.map((system) => [system.id, system]));
-  const travelRoutes = useMemo(() => buildTravelRoutes(systems), []);
+  const travelRoutes = useMemo(() => buildTravelRoutes(systems), [systems]);
   const activeSystem = lockedSystemId ? systemById.get(lockedSystemId) ?? null : null;
   const connectedSystemIds = useMemo(() => {
     if (!lockedSystemId) {
@@ -330,7 +328,7 @@ function App() {
             onPointerDown={startDrag}
             onClick={handleViewportClick}
             role="presentation"
-            aria-label="Galactic sector map"
+            aria-label={catalog.ui.app.mapAriaLabel}
           >
             <MapCanvas
               animate={{ x: offset.x, y: offset.y, scale: mapScale }}
@@ -356,7 +354,7 @@ function App() {
                 <span className="accretion-ring-b" />
                 <span className="accretion-ring-c" />
                 <span className="event-horizon" />
-                <span className="label">Agamemnon</span>
+                <span className="label">{catalog.ui.app.blackHoleLabel}</span>
               </BlackHole>
               <WarpRouteLayer viewBox={`0 0 ${MAP_SIZE.width} ${MAP_SIZE.height}`} preserveAspectRatio="none" aria-hidden>
                 <defs>
@@ -486,7 +484,7 @@ function App() {
                       event.stopPropagation();
                       setLockedSystemId(system.id);
                     }}
-                    aria-label={`Inspect ${system.name}`}
+                    aria-label={catalog.ui.app.inspectSystemAria(system.name)}
                   >
                     <span className="node-halo" />
                     <span className="node-core" />
@@ -509,7 +507,7 @@ function App() {
                               }`}
                               role="button"
                               tabIndex={0}
-                              title={`${classInfo.code} ${classInfo.title}: ${world.knownName}`}
+                              title={catalog.ui.app.worldClassTitle(classInfo.code, classInfo.title, world.knownName)}
                               onMouseDown={(event) => {
                                 event.preventDefault();
                                 event.stopPropagation();

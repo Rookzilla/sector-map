@@ -1,15 +1,23 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import App from "./App";
+import { I18nProvider } from "./i18n";
+
+const renderApp = () =>
+  render(
+    <I18nProvider>
+      <App />
+    </I18nProvider>,
+  );
 
 describe("App", () => {
   it("starts with an empty detail drawer", () => {
-    render(<App />);
+    renderApp();
 
     expect(screen.getByRole("heading", { name: "No System Selected" })).toBeInTheDocument();
   });
 
   it("does not open details on hover alone", () => {
-    render(<App />);
+    renderApp();
 
     fireEvent.mouseEnter(screen.getByRole("button", { name: /Inspect Hydraspes/i }));
 
@@ -17,7 +25,7 @@ describe("App", () => {
   });
 
   it("keeps locked context and clears on empty-map click", async () => {
-    render(<App />);
+    renderApp();
 
     fireEvent.click(screen.getByRole("button", { name: /Inspect Maximus/i }));
     await waitFor(() => {

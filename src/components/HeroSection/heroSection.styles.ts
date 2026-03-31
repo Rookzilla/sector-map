@@ -19,6 +19,48 @@ export const HeroCopy = styled(motion.div)`
   padding: 28px 32px;
 `;
 
+export const TopRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+`;
+
+export const LanguagePicker = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 176, 255, 0.25);
+  background: rgba(15, 26, 51, 0.65);
+
+  span {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #88cfff;
+    padding-left: 8px;
+  }
+
+  button {
+    border: 0;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.74rem;
+    cursor: pointer;
+    color: #dceeff;
+    background: transparent;
+  }
+
+  button.active {
+    background: rgba(107, 186, 255, 0.24);
+    color: #eff7ff;
+  }
+`;
+
 export const Eyebrow = styled.p`
   font-family: "Space Grotesk", sans-serif;
   margin: 0;
