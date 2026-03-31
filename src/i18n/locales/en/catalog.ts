@@ -1,5 +1,6 @@
 import { type I18nCatalog } from "../../types";
 import { systems, worldClassifications } from "./systems";
+import { buildPlanetDetailProfile } from "./planetProfile";
 
 export const enCatalog: I18nCatalog = {
   ui: {
@@ -95,5 +96,6 @@ export const enCatalog: I18nCatalog = {
   data: {
     systems,
     worldClassifications,
+    buildPlanetDetailProfile,
   },
 };

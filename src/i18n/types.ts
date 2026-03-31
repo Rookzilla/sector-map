@@ -1,4 +1,5 @@
 import { type StarSystem, type WorldClassInfo, type WorldClassKey } from "../data/systems";
+import { type BuildPlanetDetailProfileFn } from "../common/lore/planetProfile";
 
 export type AppLocale = "en" | "es";
 
@@ -91,5 +92,6 @@ export type I18nCatalog = {
   data: {
     systems: StarSystem[];
     worldClassifications: Record<WorldClassKey, WorldClassInfo>;
+    buildPlanetDetailProfile: BuildPlanetDetailProfileFn;
   };
 };

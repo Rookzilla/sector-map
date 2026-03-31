@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { buildPlanetDetailProfile } from "../../common/lore/planetProfile";
 import { useI18n } from "../../i18n";
 import {
   type PlanetOwnerFaction,
@@ -155,7 +154,7 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
   const { system, world } = selection;
   const { catalog } = useI18n();
   const classInfo = catalog.data.worldClassifications[world.classification];
-  const profile = buildPlanetDetailProfile(system, world);
+  const profile = catalog.data.buildPlanetDetailProfile(system, world);
   const moonSpecs = useMemo(() => makeMoonSpecs(system, world), [system, world]);
   const planetPalette = planetPaletteByClass[world.classification];
   const owner = resolvePlanetOwner(system.faction, world);
