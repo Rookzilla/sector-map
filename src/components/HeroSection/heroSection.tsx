@@ -5,7 +5,6 @@ import {
   HeroPanel,
   LanguagePicker,
   Lede,
-  StatusCard,
   Title,
   TopRow,
 } from "./heroSection.styles";
@@ -37,15 +36,6 @@ export function HeroSection() {
         <Lede>{hero.lede}</Lede>
       </HeroCopy>
 
-      <StatusCard
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.15, duration: 0.7 }}
-      >
-        <span>{hero.statusLabel}</span>
-        <strong>{hero.statusHeadline}</strong>
-        <p>{hero.statusBody}</p>
-      </StatusCard>
     </HeroPanel>
   );
 }

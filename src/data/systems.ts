@@ -50,6 +50,9 @@ export type World = {
   warboss?: string;
   renegadeCommander?: string;
   xenosAuthority?: string;
+  dossierUniqueFact?: string;
+  dossierInterdependence?: string;
+  dossierSeditionNote?: string;
 };
 
 export type StarSystem = {

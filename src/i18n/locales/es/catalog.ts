@@ -24,8 +24,8 @@ export const esCatalog: I18nCatalog = {
     },
     language: {
       label: "Idioma",
-      english: "Ingles",
-      spanish: "Espanol",
+      english: "English",
+      spanish: "Español",
     },
     interaction: {
       title: "Interaccion",

@@ -313,64 +313,12 @@ const byClassSections: Record<WorldClassKey, (system: StarSystem, world: World) 
   ],
 };
 
-const uniqueFactsByWorld: Record<string, string> = {
-  "helion-gate:Carthae": "Carthae's forge-shrines still maintain an unbroken macro-cannon blessing liturgy dating back seven crusade eras.",
-  "helion-gate:Alecto": "Alecto's lower transit grid is mapped by shrine-wardens using incense-coded route signals instead of standard lumen beacons.",
-  "vesper-drift:Eidon": "Eidon's orbital bastions rotate firing doctrine every twelve hours to mirror siege telemetry from Karsis.",
-  "vesper-drift:Karsis": "Karsis reliquary vaults are now defended by layered trench cathedrals built directly into shattered shrine districts.",
-  "noctis-bloom:Crownfall": "Crownfall's curfew sirens are synchronized to hive-spire airlocks so sabotage cells cannot move between sectors unseen.",
-  "noctis-bloom:Orison": "Orison's vault custodians circulate noosphere keys in rotating triads, preventing any single breach path from persisting.",
-  "cryon-reach:Kroadaria": "Kroadaria's armored kill-zones are so saturated with wrecks that new assault lanes are often carved through burning hull fields.",
-  "cryon-reach:Ruinfall": "Ruinfall enclaves mark safe corridors with pressure-lamps because warp storms repeatedly erase conventional cartography.",
-  "auric-null:Sepulcrum": "The mausoleum-plex of Saint Arkonidas the True is guarded by rotating Sepulcrum Watch reliquary cordons at all hours.",
-  "auric-null:Tenebra": "Tenebra's active warp gate has made daemonfall events so frequent that Ork assault waves treat each emergence like a muster gong.",
-  "lyra-span:Urk Prime": "Urk Prime foundries now stamp salvage armor with clan glyph batches tied to weekly Waaagh levy quotas.",
-  "lyra-span:Gorath": "Gorath's overgrown hive canyons are crossed by looter ropeways built through collapsed spires and vine-choked transit decks.",
-  "xandros:Xandrosia": "Xandrosia convoy plans are written in phased campaign script to survive Agamemnon-driven causality drift.",
-  "xandros:Kryost": "Kryost trenchworks are reinforced with frozen wreck plating because fresh ferrocrete deliveries no longer arrive on schedule.",
-  "aegis-prime:Castrum": "Castrum household knights still settle disputed charters through formal lance courts before wider deployment orders are issued.",
-  "aegis-prime:Medea": "Medea grain elevators are paired with void-lock annexes so harvest output can be diverted to convoy holds in minutes.",
-  "carthon-veil:Dalmor": "Dalmor ganger councils now broadcast anti-Imperial decrees from reclaimed senate vox towers under Senator Hargreave's seal.",
-  "carthon-veil:Pella": "Pella abyssal survey crews track gravitic wakes by chaining bathyscanner relays directly to orbital watch stations.",
-  "malthus:Shale": "Shale pilgrim roads are now used as ritual procession lanes for war-cults moving between blackened reliquary fronts.",
-  "malthus:Vesper Oss": "Vesper Oss catacomb elevators are powered by captured shrine reactors repurposed for continuous chant-cycle operations.",
-  "orpheon:Hektor": "Hektor line forges can refit an armored company from hull frame to live-fire test in under three standard days.",
-  "orpheon:Nysa": "Nysa convoy depots maintain triple-redundant grain vaults to absorb emergency requisitions from siege-bound neighbors.",
-  "tessarion:Scoria": "Scoria palace districts are linked by armored toll bridges privately held by archon-loyal mercenary combines.",
-  "tessarion:Bracken": "Bracken's crusading houses issue battlefield oaths on ironwood tablets carried into swordline charges by mounted heralds.",
-  "vigilant:Lumen": "Lumen polar labs test convoy shielding inside cryo-tempest chambers that mimic deep-void particulate shear.",
-  "vigilant:Guangshua": "Guangshua weather-wardens stage stormbreak drills with Jade Falcon outrider flights over flooded rice terraces.",
-  "drakonis:Skrap": "Skrap gun-ridges are tuned by mek crews who fire calibration barrages into neighboring mountain chains each dawn.",
-  "drakonis:Mekhold": "Mekhold's dead manufactoria now operate as vacuum mek-yards where hull fragments are welded into void ram craft.",
-  "elysion:Ionia": "Ionia harvest lifts are timed to orbital traffic bells so tithe grain can launch continuously during convoy windows.",
-  "elysion:Prax": "Prax militias have converted civilian transit loops into perimeter redoubts to survive the expanding Chaos siege.",
-  "kharon:Acher": "Acher siege cells anchor mountain gun-nests with chain-linked bastions carved directly into frostbound escarpments.",
-  "kharon:Black Pyre": "Black Pyre black pilgrimages now converge on the Hessicus gate under artillery cover from cult-held grave plains.",
-  "mykene:Heliad": "Heliad assault academies train breacher cohorts with live charge discipline before rotation into sector siege battlegroups.",
-  "mykene:Anker": "Anker rough rider clans begin mustering seasons with eagle-vision vigils atop terraced mountain shrines.",
-  "praxedes:Ruk": "Ruk nomad columns tow mobile fortress segments between canyon fronts to preserve momentum during clan feuds.",
-  "praxedes:Morka's Yard": "Morka's Yard breach sectors are measured by wreck-depth markers after repeated Cadian armored assaults.",
-  "satrapa:Korin": "Korin tide-harbours are built on chained breakwaters that are rebuilt after every black-hole-driven surge cycle.",
-  "satrapa:Harrow Deep": "Harrow Deep gravitic arrays are calibrated against Agamemnon drift signatures before each abyssal survey descent.",
-  "ikarion:Astraeum": "Astraeum scholam commandants grade cadets through void-bridge war games mirrored from active sector sieges.",
-  "ikarion:Ferron": "Ferron dock-priests sanctify each new escort keel with fragment data from recent convoy interception reports.",
-  "barachiel:Vespera": "Vespera shrine-fortresses now fly Sons of Piety banners stitched from seized tithe parchments.",
-  "barachiel:Civitas Null": "Civitas Null suppression cordons rotate by senate district to contain dockyard unrest before it spreads hive-wide.",
-  "gryphonis:Ragmouth": "Ragmouth invasion docks launch continuous war convoys aimed at Zubzaria's contested drop corridors.",
-  "gryphonis:Zubzaria": "Zubzaria psykommando cadres coordinate resistance through encrypted trade-cant run by the Psykommando Commerce Junta.",
-};
-
 const buildUniqueFact = (system: StarSystem, world: World) =>
-  uniqueFactsByWorld[`${system.id}:${world.knownName}`] ??
-  `${world.knownName} maintains hardened dossier protocols adapted to current campaign volatility in ${system.name}.`;
+  world.dossierUniqueFact ?? `${world.knownName} maintains hardened dossier protocols adapted to current campaign volatility in ${system.name}.`;
 
 const buildInterdependence = (system: StarSystem, world: World) => {
-  if (system.id === "xandros" && world.knownName === "Xandrosia") {
-    return "Xandrosia remains under siege and relies on stockpiled oceanic harvest reserves and terraced grain vaults while off-world deliveries collapse into asynchronous Agamemnon windows.";
-  }
-
-  if (system.id === "xandros" && world.knownName === "Kryost") {
-    return "Kryost is under siege and receives no dependable fresh deliveries, so current garrisons operate on legacy shipments and pre-siege stores transferred in earlier campaign phases.";
+  if (world.dossierInterdependence) {
+    return world.dossierInterdependence;
   }
 
   const siblings = system.worlds.filter(
@@ -471,8 +419,8 @@ export const buildPlanetDetailProfile = (system: StarSystem, world: World): Plan
   const commandAuthority = buildCommandAuthority(system, world);
   const conflictTheatre = buildConflictTheatre(system, world);
   const seditionNote =
-    world.underSedition && system.id === "tessarion" && world.knownName === "Bracken"
-      ? "Sedition risk is severe: holy-war banners mobilize feudal levies while Chaos cult magicks and contracted Sslyth mercenaries intensify attritional field fighting."
+    world.underSedition && world.dossierSeditionNote
+      ? world.dossierSeditionNote
       : world.underSedition
         ? "Sedition risk remains active. Shrine rhetoric and militia mobilization are escalating."
         : "No formal sedition marker is active at the latest command update.";

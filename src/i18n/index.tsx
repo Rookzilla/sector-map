@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import { enCatalog } from "./locales/en/catalog";
-import { esCatalog } from "./locales/es/catalog";
+import { enLocale } from "./locales/en";
+import { esLocale } from "./locales/es";
 import { type AppLocale, type I18nCatalog } from "./types";
 
 type I18nContextValue = {
@@ -10,8 +10,8 @@ type I18nContextValue = {
 };
 
 const CATALOG_BY_LOCALE: Record<AppLocale, I18nCatalog> = {
-  en: enCatalog,
-  es: esCatalog,
+  en: enLocale,
+  es: esLocale,
 };
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);

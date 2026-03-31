@@ -1,20 +1,34 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
+} from "react";
 import { Global } from "@emotion/react";
 import { AnimatePresence } from "framer-motion";
 import { HeroSection } from "./components/HeroSection";
-import { PlanetDetailPanel } from "./components/PlanetDetailPanel";
 import { SectorMapViewport } from "./components/SectorMap";
 import { SystemDetails } from "./components/SystemDetails";
+import { MobileLanguageDock, MobileLanguagePicker } from "./components/HeroSection/heroSection.styles";
 import { AppShell, globalStyles, MapLayout } from "./app.styles";
 import { useI18n } from "./i18n";
 import { clamp, getMapScale, getPanBounds, MAP_SIZE } from "./map/constants";
 import { buildTravelRoutes, getWorldKey } from "./map/routes";
 
+const PlanetDetailPanel = lazy(() =>
+  import("./components/PlanetDetailPanel").then((module) => ({ default: module.PlanetDetailPanel })),
+);
+
 function App() {
   const MIN_USER_ZOOM = 0.72;
   const MAX_USER_ZOOM = 2.15;
   const ZOOM_STEP = 0.12;
-  const { catalog } = useI18n();
+  const { locale, setLocale, catalog } = useI18n();
   const { systems, worldClassifications } = catalog.data;
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const dragMovedRef = useRef(false);
@@ -24,6 +38,8 @@ function App() {
     originX: number;
     originY: number;
   } | null>(null);
+  const touchPointsRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const pinchStateRef = useRef<{ startDistance: number; startZoom: number } | null>(null);
   const [lockedSystemId, setLockedSystemId] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: -300, y: -180 });
   const [baseScale, setBaseScale] = useState(1);
@@ -32,7 +48,18 @@ function App() {
   const [highlightedWorldKey, setHighlightedWorldKey] = useState<string | null>(null);
   const [selectedPlanetKey, setSelectedPlanetKey] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const offsetRef = useRef(offset);
   const mapScale = useMemo(() => clamp(baseScale * zoomFactor, 0.5, 3), [baseScale, zoomFactor]);
+
+  const getTouchDistance = () => {
+    const points = Array.from(touchPointsRef.current.values());
+    if (points.length < 2) {
+      return null;
+    }
+
+    const [a, b] = points;
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
 
   const systemById = new Map(systems.map((system) => [system.id, system]));
   const travelRoutes = useMemo(() => buildTravelRoutes(systems), [systems]);
@@ -89,6 +116,14 @@ function App() {
   );
 
   useEffect(() => {
+    offsetRef.current = offset;
+  }, [offset]);
+
+  const applyZoom = useCallback((nextZoomFactor: number) => {
+    setZoomFactor(clamp(nextZoomFactor, MIN_USER_ZOOM, MAX_USER_ZOOM));
+  }, [MAX_USER_ZOOM, MIN_USER_ZOOM]);
+
+  useEffect(() => {
     if (!activeSystem && selectedPlanetKey) {
       setSelectedPlanetKey(null);
       return;
@@ -134,6 +169,22 @@ function App() {
 
   useEffect(() => {
     const handlePointerMove = (event: PointerEvent) => {
+      if (touchPointsRef.current.has(event.pointerId)) {
+        touchPointsRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      }
+
+      if (pinchStateRef.current && touchPointsRef.current.size >= 2) {
+        const distance = getTouchDistance();
+        if (!distance) {
+          return;
+        }
+
+        const pinchRatio = distance / pinchStateRef.current.startDistance;
+        applyZoom(pinchStateRef.current.startZoom * pinchRatio);
+        dragMovedRef.current = true;
+        return;
+      }
+
       if (!dragState.current || !viewportRef.current) {
         return;
       }
@@ -157,20 +208,44 @@ function App() {
       });
     };
 
-    const handlePointerUp = () => {
-      dragState.current = null;
-      setIsDragging(false);
-      document.body.style.cursor = "";
+    const handlePointerUp = (event: PointerEvent) => {
+      if (touchPointsRef.current.has(event.pointerId)) {
+        touchPointsRef.current.delete(event.pointerId);
+      }
+
+      if (touchPointsRef.current.size < 2) {
+        pinchStateRef.current = null;
+      }
+
+      if (touchPointsRef.current.size === 1) {
+        const [remainingPoint] = Array.from(touchPointsRef.current.values());
+        dragState.current = {
+          startX: remainingPoint.x,
+          startY: remainingPoint.y,
+          originX: offsetRef.current.x,
+          originY: offsetRef.current.y,
+        };
+        setIsDragging(true);
+        return;
+      }
+
+      if (touchPointsRef.current.size === 0) {
+        dragState.current = null;
+        setIsDragging(false);
+        document.body.style.cursor = "";
+      }
     };
 
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, [mapScale]);
+  }, [applyZoom, mapScale]);
 
   const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -178,7 +253,22 @@ function App() {
       return;
     }
 
+    if (event.pointerType === "touch") {
+      touchPointsRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+      if (touchPointsRef.current.size >= 2) {
+        const distance = getTouchDistance();
+        if (distance) {
+          pinchStateRef.current = { startDistance: distance, startZoom: zoomFactor };
+          dragState.current = null;
+          setIsDragging(false);
+        }
+        return;
+      }
+    }
+
     dragMovedRef.current = false;
+    pinchStateRef.current = null;
     dragState.current = {
       startX: event.clientX,
       startY: event.clientY,
@@ -186,11 +276,9 @@ function App() {
       originY: offset.y,
     };
     setIsDragging(true);
-    document.body.style.cursor = "grabbing";
-  };
-
-  const applyZoom = (nextZoomFactor: number) => {
-    setZoomFactor(clamp(nextZoomFactor, MIN_USER_ZOOM, MAX_USER_ZOOM));
+    if (event.pointerType !== "touch") {
+      document.body.style.cursor = "grabbing";
+    }
   };
 
   const zoomIn = () => applyZoom(zoomFactor + ZOOM_STEP);
@@ -287,8 +375,23 @@ function App() {
           />
         </MapLayout>
         <AnimatePresence>
-          {selectedPlanet ? <PlanetDetailPanel selection={selectedPlanet} onClose={() => setSelectedPlanetKey(null)} /> : null}
+          {selectedPlanet ? (
+            <Suspense fallback={null}>
+              <PlanetDetailPanel selection={selectedPlanet} onClose={() => setSelectedPlanetKey(null)} />
+            </Suspense>
+          ) : null}
         </AnimatePresence>
+        <MobileLanguageDock>
+          <MobileLanguagePicker>
+            <span>{catalog.ui.language.label}</span>
+            <button type="button" className={locale === "en" ? "active" : ""} onClick={() => setLocale("en")}>
+              {catalog.ui.language.english}
+            </button>
+            <button type="button" className={locale === "es" ? "active" : ""} onClick={() => setLocale("es")}>
+              {catalog.ui.language.spanish}
+            </button>
+          </MobileLanguagePicker>
+        </MobileLanguageDock>
       </AppShell>
     </>
   );

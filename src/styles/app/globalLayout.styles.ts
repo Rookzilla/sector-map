@@ -27,7 +27,8 @@ export const globalStyles = css`
       radial-gradient(circle at 80% 30%, rgba(132, 58, 180, 0.1), transparent 24%),
       linear-gradient(180deg, #07111f 0%, #040814 55%, #03050d 100%);
     color: #eff6ff;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   body::before {
@@ -43,11 +44,6 @@ export const globalStyles = css`
     opacity: 0.22;
   }
 
-  @media (max-width: 980px) {
-    body {
-      overflow: auto;
-    }
-  }
 `;
 
 export const AppShell = styled.main`
@@ -57,17 +53,41 @@ export const AppShell = styled.main`
   flex-direction: column;
   gap: 24px;
 
+  @media (max-width: 1280px) {
+    padding: 20px;
+    gap: 18px;
+  }
+
   @media (max-width: 980px) {
     padding: 18px;
+  }
+
+  @media (max-height: 940px) {
+    padding: 16px;
+    gap: 12px;
   }
 `;
 
 export const MapLayout = styled.section`
+  --map-pane-height: clamp(460px, 66vh, 980px);
   flex: 1;
   min-height: 0;
   display: grid;
-  gap: 24px;
-  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.7fr);
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1.05fr);
+
+  @media (min-width: 1800px) and (min-height: 1000px) {
+    --map-pane-height: clamp(560px, 72vh, 1200px);
+    grid-template-columns: minmax(0, 1.45fr) minmax(420px, 1.05fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 1280px) {
+    --map-pane-height: auto;
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 
   @media (max-width: 980px) {
     min-height: auto;
@@ -77,7 +97,8 @@ export const MapLayout = styled.section`
 
 export const MapViewport = styled.div`
   position: relative;
-  min-height: 520px;
+  min-height: 420px;
+  height: var(--map-pane-height);
   overflow: hidden;
   border-radius: 32px;
   border: 1px solid rgba(142, 192, 255, 0.16);
@@ -99,8 +120,24 @@ export const MapViewport = styled.div`
     background: radial-gradient(circle at center, transparent 55%, rgba(2, 4, 12, 0.58) 100%);
   }
 
+  @media (max-width: 1280px) {
+    min-height: 58vh;
+    height: auto;
+  }
+
   @media (max-width: 980px) {
     min-height: 62vh;
+    height: auto;
+  }
+
+  @media (max-width: 700px) {
+    min-height: 70vh;
+    height: auto;
+  }
+
+  @media (max-height: 940px) {
+    min-height: 380px;
+    height: clamp(380px, 52vh, 620px);
   }
 `;
 
@@ -126,8 +163,8 @@ export const MapControls = styled.div`
     background: rgba(12, 24, 50, 0.9);
     color: #e5f2ff;
     border-radius: 10px;
-    width: 40px;
-    height: 34px;
+    width: 42px;
+    height: 36px;
     font-size: 1rem;
     cursor: pointer;
     line-height: 1;
@@ -141,6 +178,10 @@ export const MapControls = styled.div`
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  @media (max-width: 700px) {
+    display: none;
+  }
 `;
 
 export const MapZoomLabel = styled.div`
@@ -153,4 +194,10 @@ export const MapZoomLabel = styled.div`
   color: #cfe6ff;
   font-family: "Space Grotesk", sans-serif;
   font-size: 0.78rem;
+
+  @media (max-width: 700px) {
+    min-width: 80px;
+    font-size: 0.82rem;
+    padding: 7px 8px;
+  }
 `;

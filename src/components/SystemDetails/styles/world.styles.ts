@@ -40,6 +40,23 @@ export const WorldCard = styled(motion.div, {
     margin-bottom: 0;
     color: #96a7c7;
     line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 700px) {
+    padding: 12px 12px;
+    border-radius: 14px;
+
+    p {
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .world-status,
+    .world-intel-line,
+    .world-intel-subline {
+      display: none;
+    }
   }
 `;
 
@@ -55,10 +72,23 @@ export const WorldTopline = styled.div`
     font-size: 0.94rem;
     letter-spacing: 0.02em;
   }
+
+  @media (max-width: 700px) {
+    grid-template-columns: minmax(92px, max-content) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
 `;
 
 export const WorldDesignation = styled.strong`
   justify-self: start;
+  white-space: nowrap;
+
+  @media (max-width: 700px) {
+    font-size: 0.82rem;
+    opacity: 0.88;
+  }
 `;
 
 export const KnownWorldName = styled.span`
@@ -67,6 +97,16 @@ export const KnownWorldName = styled.span`
   font-family: "Cinzel Decorative", serif;
   font-size: 1.08rem;
   letter-spacing: 0.04em;
+
+  @media (max-width: 700px) {
+    justify-self: center;
+    text-align: center;
+    padding-inline: 4px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 export const WorldClassBlock = styled.div`
@@ -81,6 +121,14 @@ export const WorldClassBlock = styled.div`
     font-size: 0.84rem;
     text-align: right;
     line-height: 1.3;
+  }
+
+  @media (max-width: 700px) {
+    justify-self: end;
+
+    .class-title {
+      display: none;
+    }
   }
 `;
 
@@ -144,6 +192,12 @@ export const ClassBubble = styled.button<{ active: boolean }>`
       opacity: 0.45;
     }
   }
+
+  @media (max-width: 700px) {
+    width: 22px;
+    height: 22px;
+    font-size: 0.68rem;
+  }
 `;
 
 export const ClimateBadge = styled.span<{ climate: Climate }>`
@@ -157,6 +211,11 @@ export const ClimateBadge = styled.span<{ climate: Climate }>`
   background: ${({ climate }) => climatePalette[climate].bg};
   border: 1px solid ${({ climate }) => climatePalette[climate].border};
   color: ${({ climate }) => climatePalette[climate].text};
+
+  @media (max-width: 700px) {
+    font-size: 0.68rem;
+    padding: 3px 7px;
+  }
 `;
 
 export const WorldBadges = styled.div`
@@ -164,6 +223,11 @@ export const WorldBadges = styled.div`
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
+
+  @media (max-width: 700px) {
+    margin-top: 6px;
+    gap: 6px;
+  }
 `;
 
 export const SeditionBadge = styled.span`

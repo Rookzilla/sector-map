@@ -3,20 +3,18 @@ import { motion } from "framer-motion";
 import { panelSurfaceStyles } from "../../common/styles/panelStyles";
 
 export const HeroPanel = styled.section`
-  display: grid;
-  gap: 24px;
-  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
-  align-items: start;
-
-  @media (max-width: 980px) {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
 `;
 
 export const HeroCopy = styled(motion.div)`
   ${panelSurfaceStyles}
   border-radius: 28px;
-  padding: 28px 32px;
+  padding: 24px 30px;
+  width: 100%;
+
+  @media (max-height: 940px) {
+    padding: 18px 22px;
+  }
 `;
 
 export const TopRow = styled.div`
@@ -59,6 +57,44 @@ export const LanguagePicker = styled.div`
     background: rgba(107, 186, 255, 0.24);
     color: #eff7ff;
   }
+
+  @media (max-width: 700px) {
+    display: none;
+  }
+`;
+
+export const MobileLanguageDock = styled.div`
+  display: none;
+
+  @media (max-width: 700px) {
+    position: sticky;
+    bottom: 8px;
+    z-index: 12;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    margin-top: 6px;
+  }
+`;
+
+export const MobileLanguagePicker = styled(LanguagePicker)`
+  @media (max-width: 700px) {
+    display: inline-flex;
+    pointer-events: auto;
+    padding: 5px;
+    background: rgba(7, 16, 36, 0.92);
+    border-color: rgba(140, 190, 255, 0.32);
+    box-shadow: 0 10px 24px rgba(2, 6, 15, 0.45);
+
+    span {
+      font-size: 0.66rem;
+    }
+
+    button {
+      font-size: 0.72rem;
+      padding: 5px 10px;
+    }
+  }
 `;
 
 export const Eyebrow = styled.p`
@@ -77,6 +113,16 @@ export const Title = styled.h1`
   font-family: "Cinzel Decorative", serif;
   font-size: clamp(2.8rem, 7vw, 5.8rem);
   line-height: 1;
+
+  @media (max-width: 1200px) {
+    white-space: normal;
+    font-size: clamp(2.4rem, 7.5vw, 4.6rem);
+  }
+
+  @media (max-height: 940px) {
+    margin: 8px 0 12px;
+    font-size: clamp(2.1rem, 5vw, 3.5rem);
+  }
 `;
 
 export const Lede = styled.p`
@@ -86,32 +132,9 @@ export const Lede = styled.p`
   color: #96a7c7;
   font-size: 1rem;
   line-height: 1.7;
-`;
 
-export const StatusCard = styled(motion.aside)`
-  ${panelSurfaceStyles}
-  border-radius: 24px;
-  padding: 24px;
-
-  span {
-    font-family: "Space Grotesk", sans-serif;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    font-size: 0.72rem;
-    color: #6be7ff;
-  }
-
-  strong {
-    display: block;
-    font-family: "Space Grotesk", sans-serif;
-    margin-top: 12px;
-    font-size: 1.5rem;
-  }
-
-  p {
-    font-family: "Space Grotesk", sans-serif;
-    color: #96a7c7;
-    line-height: 1.7;
+  @media (max-height: 940px) {
+    font-size: 0.94rem;
+    line-height: 1.55;
   }
 `;

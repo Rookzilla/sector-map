@@ -20,4 +20,9 @@ export const Card = styled(motion.div)`
     color: #96a7c7;
     line-height: 1.6;
   }
+
+  @media (max-height: 940px) {
+    border-radius: 20px;
+    padding: 16px 18px;
+  }
 `;

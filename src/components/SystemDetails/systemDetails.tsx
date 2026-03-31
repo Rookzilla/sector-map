@@ -69,22 +69,22 @@ export function SystemDetails({
               <FactionChip>{systemDetails.factionDisplay[activeSystem.faction]}</FactionChip>
             </DetailHeader>
 
-            <DetailSummary>{activeSystem.summary}</DetailSummary>
+            <DetailSummary className="system-summary">{activeSystem.summary}</DetailSummary>
 
-            <StarMetaGrid>
-              <StarMetaCard>
+            <StarMetaGrid className="system-meta-grid">
+              <StarMetaCard className="meta-star-class">
                 <strong>{systemDetails.starClass}</strong>
                 <span>{activeSystem.starClass}</span>
               </StarMetaCard>
-              <StarMetaCard>
+              <StarMetaCard className="meta-star-age">
                 <strong>{systemDetails.estimatedAge}</strong>
                 <span>{activeSystem.starAge}</span>
               </StarMetaCard>
-              <StarMetaCard>
+              <StarMetaCard className="meta-stability">
                 <strong>{systemDetails.stability}</strong>
                 <span>{activeSystem.stability}</span>
               </StarMetaCard>
-              <StarMetaCard>
+              <StarMetaCard className="meta-astral-note">
                 <strong>{systemDetails.astralNote}</strong>
                 <span>{activeSystem.astralNote}</span>
               </StarMetaCard>
@@ -149,11 +149,11 @@ export function SystemDetails({
                       {world.underSiege ? <SiegeBadge>{systemDetails.underSiege}</SiegeBadge> : null}
                       {world.underSedition ? <SeditionBadge>{systemDetails.sedition}</SeditionBadge> : null}
                     </WorldBadges>
-                    <p>
+                    <p className="world-population">
                       {systemDetails.populationLabel}: {world.population}
                     </p>
-                    <p>{world.status}</p>
-                    <IntelLine>
+                    <p className="world-status">{world.status}</p>
+                    <IntelLine className="world-intel-line">
                       <strong>{getIntelLabel(activeSystem.faction, world, systemDetails)}:</strong>
                       {getFactionIntel(activeSystem.faction, world, systemDetails)}
                       {!secondaryIntel ? (
@@ -163,7 +163,7 @@ export function SystemDetails({
                       ) : null}
                     </IntelLine>
                     {secondaryIntel ? (
-                      <IntelSubLine>
+                      <IntelSubLine className="world-intel-subline">
                         <strong>{secondaryIntel.label}:</strong>
                         {secondaryIntel.value}
                         <OwnerPill owner={owner} className="intel-owner">
