@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 import { Global } from "@emotion/react";
 import { AnimatePresence } from "framer-motion";
 import { HeroSection } from "./components/HeroSection";
@@ -11,6 +11,9 @@ import { clamp, getMapScale, getPanBounds, MAP_SIZE } from "./map/constants";
 import { buildTravelRoutes, getWorldKey } from "./map/routes";
 
 function App() {
+  const MIN_USER_ZOOM = 0.72;
+  const MAX_USER_ZOOM = 2.15;
+  const ZOOM_STEP = 0.12;
   const { catalog } = useI18n();
   const { systems, worldClassifications } = catalog.data;
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -23,10 +26,13 @@ function App() {
   } | null>(null);
   const [lockedSystemId, setLockedSystemId] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: -300, y: -180 });
-  const [mapScale, setMapScale] = useState(1);
+  const [baseScale, setBaseScale] = useState(1);
+  const [zoomFactor, setZoomFactor] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
   const [highlightedWorldKey, setHighlightedWorldKey] = useState<string | null>(null);
   const [selectedPlanetKey, setSelectedPlanetKey] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mapScale = useMemo(() => clamp(baseScale * zoomFactor, 0.5, 3), [baseScale, zoomFactor]);
 
   const systemById = new Map(systems.map((system) => [system.id, system]));
   const travelRoutes = useMemo(() => buildTravelRoutes(systems), [systems]);
@@ -98,7 +104,7 @@ function App() {
 
   useEffect(() => {
     const handleResize = () => {
-      setMapScale(getMapScale(window.innerWidth));
+      setBaseScale(getMapScale(window.innerWidth));
     };
 
     handleResize();
@@ -153,6 +159,7 @@ function App() {
 
     const handlePointerUp = () => {
       dragState.current = null;
+      setIsDragging(false);
       document.body.style.cursor = "";
     };
 
@@ -178,7 +185,22 @@ function App() {
       originX: offset.x,
       originY: offset.y,
     };
+    setIsDragging(true);
     document.body.style.cursor = "grabbing";
+  };
+
+  const applyZoom = (nextZoomFactor: number) => {
+    setZoomFactor(clamp(nextZoomFactor, MIN_USER_ZOOM, MAX_USER_ZOOM));
+  };
+
+  const zoomIn = () => applyZoom(zoomFactor + ZOOM_STEP);
+  const zoomOut = () => applyZoom(zoomFactor - ZOOM_STEP);
+  const zoomReset = () => applyZoom(1);
+
+  const handleWheelZoom = (event: ReactWheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const direction = event.deltaY < 0 ? 1 : -1;
+    applyZoom(zoomFactor + direction * ZOOM_STEP * 0.45);
   };
 
   const clearContext = () => {
@@ -221,7 +243,7 @@ function App() {
             viewportRef={viewportRef}
             offset={offset}
             mapScale={mapScale}
-            dragging={Boolean(dragState.current)}
+            dragging={isDragging}
             systems={systems}
             systemById={systemById}
             travelRoutes={travelRoutes}
@@ -233,10 +255,21 @@ function App() {
             getWorldKey={getWorldKey}
             mapAriaLabel={catalog.ui.app.mapAriaLabel}
             blackHoleLabel={catalog.ui.app.blackHoleLabel}
+            zoomInLabel={catalog.ui.app.zoomIn}
+            zoomOutLabel={catalog.ui.app.zoomOut}
+            zoomResetLabel={catalog.ui.app.zoomReset}
+            zoomLevelLabel={catalog.ui.app.zoomLevelLabel(Math.round(zoomFactor * 100))}
+            canZoomIn={zoomFactor < MAX_USER_ZOOM}
+            canZoomOut={zoomFactor > MIN_USER_ZOOM}
             inspectSystemAria={catalog.ui.app.inspectSystemAria}
             worldClassTitle={catalog.ui.app.worldClassTitle}
+            formatFaction={(faction) => catalog.ui.systemDetails.factionDisplay[faction]}
             onStartDrag={startDrag}
             onViewportClick={handleViewportClick}
+            onWheelZoom={handleWheelZoom}
+            onZoomIn={zoomIn}
+            onZoomOut={zoomOut}
+            onZoomReset={zoomReset}
             onSystemSelect={setLockedSystemId}
             onWorldSelect={(systemId, worldKey) => {
               setLockedSystemId(systemId);

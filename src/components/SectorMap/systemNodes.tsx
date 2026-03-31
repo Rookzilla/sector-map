@@ -11,6 +11,7 @@ type SystemNodesProps = {
   getWorldKey: (systemId: string, world: World) => string;
   inspectSystemAria: (systemName: string) => string;
   worldClassTitle: (classCode: string, classTitle: string, worldName: string) => string;
+  formatFaction: (faction: StarSystem["faction"]) => string;
   onSystemSelect: (systemId: string) => void;
   onWorldSelect: (systemId: string, worldKey: string) => void;
 };
@@ -25,6 +26,7 @@ export function SystemNodes({
   getWorldKey,
   inspectSystemAria,
   worldClassTitle,
+  formatFaction,
   onSystemSelect,
   onWorldSelect,
 }: SystemNodesProps) {
@@ -61,7 +63,7 @@ export function SystemNodes({
             <span className="node-orbit-2" />
             <span className="node-label">
               <strong>{system.name}</strong>
-              <small>{system.faction}</small>
+              <small>{formatFaction(system.faction)}</small>
               <span className="node-world-links">
                 {system.worlds.map((world) => {
                   const worldKey = getWorldKey(system.id, world);

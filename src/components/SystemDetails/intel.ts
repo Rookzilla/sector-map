@@ -1,4 +1,4 @@
-import { type Climate, type PlanetOwnerFaction, type SpaceFaction, type World } from "../../data/systems";
+import { type PlanetOwnerFaction, type SpaceFaction, type World } from "../../data/systems";
 
 type IntelCopy = {
   factionIntelLabels: {
@@ -26,19 +26,6 @@ type IntelCopy = {
     governorUnknown: string;
     chaosUndivided: string;
   };
-};
-
-export const climateDisplay: Record<Climate, string> = {
-  Temperate: "Temperate",
-  Arcapelago: "Archipelago",
-  Ocean: "Oceanic",
-  Forest: "Forested",
-  Tundra: "Tundra",
-  Ice: "Ice",
-  Desert: "Desert",
-  Savannah: "Savannah",
-  Barren: "Barren",
-  "No Atmosphere": "No Atmosphere",
 };
 
 export const getIntelLabel = (faction: SpaceFaction, world: World, copy: IntelCopy) => {

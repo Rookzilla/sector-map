@@ -184,9 +184,9 @@ export function PlanetDetailPanel({ selection, onClose }: PlanetDetailPanelProps
           <ChipRow>
             <Chip>{classInfo.code}</Chip>
             <Chip>{classInfo.title}</Chip>
-            <Chip>{owner}</Chip>
+            <Chip>{catalog.ui.systemDetails.factionDisplay[owner]}</Chip>
             <Chip tone={system.threat === "critical" ? "danger" : system.threat === "high" ? "warn" : "neutral"}>
-              {panelCopy.systemThreat}: {system.threat}
+              {panelCopy.systemThreat}: {catalog.ui.systemDetails.threatLevelLabel[system.threat]}
             </Chip>
             {world.underSiege ? <Chip tone="danger">{panelCopy.underSiege}</Chip> : null}
             {world.underSedition ? <Chip tone="danger">{panelCopy.sedition}</Chip> : null}

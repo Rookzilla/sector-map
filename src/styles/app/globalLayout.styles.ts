@@ -111,3 +111,46 @@ export const MapCanvas = styled(motion.div)`
     linear-gradient(rgba(106, 145, 220, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(106, 145, 220, 0.1) 1px, transparent 1px);
 `;
+
+export const MapControls = styled.div`
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 8;
+  display: grid;
+  gap: 8px;
+  pointer-events: auto;
+
+  button {
+    border: 1px solid rgba(132, 189, 255, 0.34);
+    background: rgba(12, 24, 50, 0.9);
+    color: #e5f2ff;
+    border-radius: 10px;
+    width: 40px;
+    height: 34px;
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  button:hover {
+    background: rgba(28, 49, 92, 0.95);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export const MapZoomLabel = styled.div`
+  min-width: 72px;
+  text-align: center;
+  border: 1px solid rgba(132, 189, 255, 0.28);
+  border-radius: 10px;
+  padding: 6px 8px;
+  background: rgba(9, 18, 38, 0.85);
+  color: #cfe6ff;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.78rem;
+`;

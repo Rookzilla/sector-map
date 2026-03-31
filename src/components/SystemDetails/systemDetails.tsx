@@ -27,7 +27,7 @@ import {
   WorldList,
   WorldTopline,
 } from "./systemDetails.styles";
-import { climateDisplay, getFactionIntel, getIntelLabel, getSecondaryIntel, resolvePlanetOwner } from "./intel";
+import { getFactionIntel, getIntelLabel, getSecondaryIntel, resolvePlanetOwner } from "./intel";
 
 type SystemDetailsProps = {
   activeSystem: StarSystem | null;
@@ -66,7 +66,7 @@ export function SystemDetails({
                 <Threat level={activeSystem.threat}>{systemDetails.threatCopy[activeSystem.threat]}</Threat>
                 <h2>{activeSystem.name}</h2>
               </div>
-              <FactionChip>{activeSystem.faction}</FactionChip>
+              <FactionChip>{systemDetails.factionDisplay[activeSystem.faction]}</FactionChip>
             </DetailHeader>
 
             <DetailSummary>{activeSystem.summary}</DetailSummary>
@@ -144,7 +144,7 @@ export function SystemDetails({
                     </WorldTopline>
                     <WorldBadges>
                       <ClimateBadge climate={world.climate}>
-                        {systemDetails.climateLabel}: {climateDisplay[world.climate]}
+                        {systemDetails.climateLabel}: {systemDetails.climateDisplay[world.climate]}
                       </ClimateBadge>
                       {world.underSiege ? <SiegeBadge>{systemDetails.underSiege}</SiegeBadge> : null}
                       {world.underSedition ? <SeditionBadge>{systemDetails.sedition}</SeditionBadge> : null}
@@ -158,7 +158,7 @@ export function SystemDetails({
                       {getFactionIntel(activeSystem.faction, world, systemDetails)}
                       {!secondaryIntel ? (
                         <OwnerPill owner={owner} className="intel-owner">
-                          {owner}
+                          {systemDetails.factionDisplay[owner]}
                         </OwnerPill>
                       ) : null}
                     </IntelLine>
@@ -167,7 +167,7 @@ export function SystemDetails({
                         <strong>{secondaryIntel.label}:</strong>
                         {secondaryIntel.value}
                         <OwnerPill owner={owner} className="intel-owner">
-                          {owner}
+                          {systemDetails.factionDisplay[owner]}
                         </OwnerPill>
                       </IntelSubLine>
                     ) : null}
