@@ -61,8 +61,8 @@ REQUESTS_JSON="$(aws cloudwatch get-metric-statistics \
   --region us-east-1 \
   --output json)"
 
-read -r DATA_MB REQUESTS_COUNT DATA_PERCENT REQUESTS_PERCENT <<EOF
-$(BYTES_JSON="$BYTES_JSON" REQUESTS_JSON="$REQUESTS_JSON" CF_DATA_LIMIT_MB="$CF_DATA_LIMIT_MB" CF_REQUEST_LIMIT="$CF_REQUEST_LIMIT" python - <<'PY'
+metrics_line="$(
+BYTES_JSON="$BYTES_JSON" REQUESTS_JSON="$REQUESTS_JSON" CF_DATA_LIMIT_MB="$CF_DATA_LIMIT_MB" CF_REQUEST_LIMIT="$CF_REQUEST_LIMIT" python - <<'PY'
 import json
 import os
 
@@ -80,8 +80,9 @@ mb_pct = (mb_total / mb_limit * 100.0) if mb_limit > 0 else 0.0
 req_pct = (requests_total / req_limit * 100.0) if req_limit > 0 else 0.0
 
 print(f"{mb_total:.2f} {requests_total:.0f} {mb_pct:.2f} {req_pct:.2f}")
-PY)
-EOF
+PY
+)"
+read -r DATA_MB REQUESTS_COUNT DATA_PERCENT REQUESTS_PERCENT <<<"$metrics_line"
 
 echo "CloudFront month-to-date usage for $DIST_ID"
 echo "- Data transfer: ${DATA_MB} MB / ${CF_DATA_LIMIT_MB} MB (${DATA_PERCENT}%)"
