@@ -2,6 +2,8 @@
 
 An interactive encyclopedia of the Cowled Abyss: explore a living star-sector map, inspect system intelligence, and open detailed planetary dossiers with faction context, conflict status, and campaign lore.
 
+<img width="1908" height="943" alt="image" src="https://github.com/user-attachments/assets/f3070488-c121-44b0-a285-eeccdad5446d" />
+
 ## Live Deployment
 
 https://d3hqzjp3q77og.cloudfront.net/
